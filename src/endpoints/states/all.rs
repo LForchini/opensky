@@ -2,7 +2,7 @@ use std::borrow::Cow;
 
 use api_binding::endpoint_prelude::*;
 use derive_builder::Builder;
-use derive_getters::Getters;
+use derive_getters::{Dissolve, Getters};
 use serde::Deserialize;
 
 use crate::{BoundingBox, Icao24, State};
@@ -50,7 +50,7 @@ impl api_binding::Endpoint for Endpoint {
     }
 }
 
-#[derive(Deserialize, Debug, Getters)]
+#[derive(Deserialize, Debug, Getters, Dissolve)]
 pub struct Response {
     states: Option<Vec<State>>,
     time: u64,

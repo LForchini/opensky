@@ -5,8 +5,8 @@ use thiserror::Error;
 
 #[derive(Debug)]
 pub struct OpenSky {
-    async_client: reqwest::Client,
-    client: reqwest::blocking::Client,
+    async_client: Option<reqwest::Client>,
+    client: Option<reqwest::blocking::Client>,
     auth: Option<String>,
     rest_url: Url,
 }
@@ -15,13 +15,24 @@ impl OpenSky {
     pub fn new() -> Result<Self, OpenSkyError> {
         let rest_url = Url::parse("https://opensky-network.org/api/")?;
         let client = reqwest::blocking::Client::new();
-        let async_client = reqwest::Client::new();
 
         Ok(OpenSky {
             rest_url,
             auth: None,
-            client,
-            async_client,
+            client: Some(client),
+            async_client: None,
+        })
+    }
+
+    pub async fn new_async() -> Result<Self, OpenSkyError> {
+        let rest_url = Url::parse("https://opensky-network.org/api/")?;
+        let client = reqwest::Client::new();
+
+        Ok(OpenSky {
+            rest_url,
+            auth: None,
+            client: None,
+            async_client: Some(client),
         })
     }
 
@@ -56,7 +67,7 @@ impl Client for OpenSky {
                 let headers = request.headers_mut();
                 headers.insert("Authorization", HeaderValue::from_str(&auth)?);
             }
-            let rsp = self.client.execute(request)?;
+            let rsp = self.client.as_ref().unwrap().execute(request)?;
 
             let mut http_rsp = HttpResponse::builder()
                 .status(rsp.status())
@@ -87,7 +98,7 @@ impl AsyncClient for OpenSky {
                 let headers = request.headers_mut();
                 headers.insert("Authorization", HeaderValue::from_str(&auth)?);
             }
-            let rsp = self.async_client.execute(request).await?;
+            let rsp = self.async_client.as_ref().unwrap().execute(request).await?;
 
             let mut http_rsp = HttpResponse::builder()
                 .status(rsp.status())

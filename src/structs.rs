@@ -71,7 +71,7 @@ impl ParamType<'static> for BoundingBox {
     }
 }
 
-#[derive(Deserialize, Debug, Getters)]
+#[derive(Deserialize, Debug, Getters, Clone)]
 pub struct State {
     icao24: String,
     callsign: Option<String>,
@@ -91,6 +91,12 @@ pub struct State {
     spi: bool,
     position_source: u8,
     // category: Option<u16>,
+}
+
+impl PartialEq for State {
+    fn eq(&self, other: &Self) -> bool {
+        self.icao24 == other.icao24
+    }
 }
 
 #[derive(Deserialize, Debug, Getters)]

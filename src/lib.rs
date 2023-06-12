@@ -10,4 +10,4 @@ pub use opensky::OpenSky;
 
 pub use structs::*;
 
-pub use api_binding::{Client, Endpoint, Query};
+pub use api_binding::{AsyncClient, AsyncQuery, Client, Endpoint, Query};
