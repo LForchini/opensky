@@ -1,8 +1,13 @@
 mod endpoints;
 mod opensky;
+mod structs;
 
-pub use endpoints::states::all::{All, AllBuilder, AllBuilderError, AllResponse, Icao24};
+pub use endpoints::flights;
+pub use endpoints::states;
+pub use endpoints::track;
 
 pub use opensky::OpenSky;
+
+pub use structs::*;
 
 pub use api_binding::{Client, Endpoint, Query};

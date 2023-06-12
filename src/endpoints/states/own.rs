@@ -1,25 +1,21 @@
-use std::borrow::Cow;
-
 use api_binding::endpoint_prelude::*;
 use derive_builder::Builder;
 use derive_getters::Getters;
 use serde::Deserialize;
 
-use crate::{BoundingBox, Icao24, State};
+use crate::{Icao24, State};
 
-#[derive(Debug, Builder, Clone)]
+#[derive(Debug, Clone, Builder)]
 #[builder(setter(strip_option))]
 pub struct Endpoint {
-    #[builder(setter(into), default)]
+    #[builder(default)]
     time: Option<i64>,
-    #[builder(setter(into), default)]
+
+    #[builder(default)]
     icao24: Option<Icao24>,
 
     #[builder(default)]
-    bounding_box: Option<BoundingBox>,
-
-    #[builder(setter(into), default)]
-    extended: Option<i32>,
+    serials: Option<Vec<u64>>,
 }
 
 impl Endpoint {
@@ -33,8 +29,8 @@ impl api_binding::Endpoint for Endpoint {
         Method::GET
     }
 
-    fn endpoint(&self) -> Cow<'static, str> {
-        "states/all".into()
+    fn endpoint(&self) -> std::borrow::Cow<'static, str> {
+        "states/own".into()
     }
 
     fn parameters(&self) -> QueryParams {
@@ -43,8 +39,11 @@ impl api_binding::Endpoint for Endpoint {
         params
             .push_opt("time", self.time)
             .push_opt("icao24", self.icao24.as_ref())
-            .extend_type_opt(self.bounding_box)
-            .push_opt("extended", self.extended);
+            .extend_opt(
+                self.serials
+                    .clone()
+                    .map(|i| i.into_iter().map(|serial| ("serials", serial))),
+            );
 
         params
     }
@@ -52,6 +51,6 @@ impl api_binding::Endpoint for Endpoint {
 
 #[derive(Deserialize, Debug, Getters)]
 pub struct Response {
-    states: Option<Vec<State>>,
     time: u64,
+    states: Vec<State>,
 }
