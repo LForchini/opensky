@@ -9,7 +9,8 @@ use crate::{Icao24, Track};
 #[builder(setter(strip_option))]
 pub struct Endpoint {
     icao24: Icao24,
-    time: u64,
+    #[builder(default)]
+    time: Option<u64>,
 }
 
 impl Endpoint {
@@ -30,7 +31,9 @@ impl api_binding::Endpoint for Endpoint {
     fn parameters(&self) -> QueryParams {
         let mut params = QueryParams::default();
 
-        params.push("icao24", &self.icao24).push("time", self.time);
+        params
+            .push("icao24", &self.icao24)
+            .push_opt("time", self.time);
 
         params
     }
